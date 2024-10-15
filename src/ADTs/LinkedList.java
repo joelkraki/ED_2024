@@ -32,7 +32,7 @@ public abstract class LinkedList<T> implements ListADT<T> {
     }
 
     @Override
-    public boolean contains(T target) throws EmptyCollectionException {
+    public boolean contains(T target) {
         return false;
     }
 
@@ -48,6 +48,23 @@ public abstract class LinkedList<T> implements ListADT<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return null;
+        return new BasicIterator<>();
+    }
+
+    private class BasicIterator<T> implements Iterator<T> {
+        @Override
+        public boolean hasNext() {
+            return false;
+        }
+
+        @Override
+        public T next() {
+            return null;
+        }
+
+        @Override
+        public void remove() {
+            Iterator.super.remove();
+        }
     }
 }
