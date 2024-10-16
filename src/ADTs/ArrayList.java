@@ -3,21 +3,27 @@ package ADTs;
 import Exceptions.ElementNotFoundException;
 import Exceptions.EmptyCollectionException;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public abstract class ArrayList<T> implements ListADT<T> {
 
-    private static final int INITIAL_CAPACITY = 1;
+    private static final int DEFAULT_INITIAL_CAPACITY = 1;
     private static final int GROWTH_FACTOR = 2;
 
-    private T[] list;
-    private int size;
-    private int modCount;
+    protected T[] list;
+    protected int size;
+    protected int modCount;
 
-    public ArrayList() {
-        list = (T[]) new Object[INITIAL_CAPACITY];
+    public ArrayList(int capacity) {
+        list = (T[]) new Object[capacity];
         this.size = 0;
         this.modCount = 0;
+    }
+
+    public ArrayList() {
+        this(DEFAULT_INITIAL_CAPACITY);
     }
 
     @Override
@@ -32,7 +38,8 @@ public abstract class ArrayList<T> implements ListADT<T> {
             this.list[i] = this.list[i + 1];
         }
 
-        this.list[this.size-- - 1] = null;
+        this.list[this.size - 1] = null;
+        this.size--;
         this.modCount++;
         return first;
     }
@@ -45,7 +52,8 @@ public abstract class ArrayList<T> implements ListADT<T> {
 
         T last = this.list[this.size - 1];
 
-        this.list[this.size-- - 1] = null;
+        this.list[this.size - 1] = null;
+        this.size--;
         this.modCount++;
         return last;
     }
@@ -110,7 +118,25 @@ public abstract class ArrayList<T> implements ListADT<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return new BasicIterator<>(this.modCount);
+        return new BasicIterator(this.modCount);
+    }
+
+    @Override
+    public String toString() {
+        if (this.size == 0) {
+            return "[]";
+        }
+
+        StringBuilder str = new StringBuilder("[");
+
+        int i;
+        for (i = 0; i < this.size() - 1; i++) {
+            str.append(list[i]).append(", ");
+        }
+
+        str.append(list[i]).append("]");
+
+        return str.toString();
     }
 
     private int findElement(T element) throws ElementNotFoundException {
@@ -123,28 +149,67 @@ public abstract class ArrayList<T> implements ListADT<T> {
         throw new ElementNotFoundException(ElementNotFoundException.DEFAULT_MSG);
     }
 
-    private class BasicIterator<T> implements Iterator<T> {
+    private class BasicIterator implements Iterator<T> {
+        private int cursor;
         private boolean okToRemove;
         private int expectedModCount;
 
         public BasicIterator(int expectedModCount) {
             this.expectedModCount = expectedModCount;
             this.okToRemove = false;
+            this.cursor = 0;
         }
 
         @Override
         public boolean hasNext() {
-            return false;
+            return cursor != size;
         }
 
         @Override
         public T next() {
-            return null;
+            if (expectedModCount != modCount) {
+                throw new ConcurrentModificationException("Concurrent Modification Detected.");
+            }
+            if (cursor == size) {
+                throw new NoSuchElementException("Next element not found");
+            }
+
+            this.okToRemove = true;
+
+            return list[cursor++];
         }
 
         @Override
         public void remove() {
-            Iterator.super.remove();
+            if (expectedModCount != modCount) {
+                throw new ConcurrentModificationException("Concurrent Modification Detected.");
+            }
+
+            if (!okToRemove) {
+                throw new UnsupportedOperationException("Can't perform this operation");
+            }
+
+            for (int i = cursor - 1; i < ArrayList.this.size - 1; i++) {
+                ArrayList.this.list[i] = ArrayList.this.list[i + 1];
+            }
+
+            ArrayList.this.list[ArrayList.this.size - 1] = null;
+            ArrayList.this.size--;
+            ArrayList.this.modCount++;
+
+            okToRemove = false;
+            this.expectedModCount++;
         }
     }
+
+    protected void expandCapacity() {
+        T[] newArray = (T[]) (new Object[this.list.length * GROWTH_FACTOR]);
+
+        for (int i = 0; i < this.list.length; i++) {
+            newArray[i] = this.list[i];
+        }
+
+        this.list = newArray;
+    }
+
 }
