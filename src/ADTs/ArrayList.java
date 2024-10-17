@@ -65,7 +65,6 @@ public abstract class ArrayList<T> implements ListADT<T> {
         }
 
         int index = findElement(element);
-        T toRemove = this.list[index];
 
         for (int i = index; i < this.size - 1; i++) {
             this.list[i] = this.list[i + 1];
@@ -74,7 +73,7 @@ public abstract class ArrayList<T> implements ListADT<T> {
         this.list[this.size - 1] = null;
         this.size--;
         this.modCount++;
-        return toRemove;
+        return element;
     }
 
     @Override
