@@ -157,7 +157,7 @@ public abstract class LinkedList<T> implements ListADT<T> {
         return str.toString();
     }
 
-    private DoubleLinearNode<T> findNode(T element) throws ElementNotFoundException {
+    protected DoubleLinearNode<T> findNode(T element) throws ElementNotFoundException {
         DoubleLinearNode<T> current = this.head;
 
         while (current != null && !current.getElement().equals(element)) {

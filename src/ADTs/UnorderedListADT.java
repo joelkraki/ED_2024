@@ -1,5 +1,6 @@
 package ADTs;
 
+import Exceptions.ElementNotFoundException;
 import Exceptions.EmptyCollectionException;
 import Exceptions.NoSuchElementException;
 
@@ -29,8 +30,8 @@ public interface UnorderedListADT<T> extends ListADT<T> {
      *
      * @param element the element to be added after the target
      * @param target  the target is the item that the element is added after
-     * @throws NoSuchElementException if the target is not found
+     * @throws ElementNotFoundException if the target is not found
      */
-    void addAfter(T element, T target) throws EmptyCollectionException, NoSuchElementException;
+    void addAfter(T element, T target) throws EmptyCollectionException, ElementNotFoundException;
 
 }

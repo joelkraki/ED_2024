@@ -138,7 +138,7 @@ public abstract class ArrayList<T> implements ListADT<T> {
         return str.toString();
     }
 
-    private int findElement(T element) throws ElementNotFoundException {
+    protected int findElement(T element) throws ElementNotFoundException {
         for (int i = 0; i < this.size; i++) {
             if (this.list[i].equals(element)) {
                 return i;
@@ -196,6 +196,7 @@ public abstract class ArrayList<T> implements ListADT<T> {
             ArrayList.this.size--;
             ArrayList.this.modCount++;
 
+            this.cursor--;
             okToRemove = false;
             this.expectedModCount++;
         }
