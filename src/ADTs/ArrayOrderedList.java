@@ -22,23 +22,23 @@ public class ArrayOrderedList<T> extends ArrayList<T> implements OrderedListADT<
             throw new NonComparableElementException(NonComparableElementException.DEFAULT_MSG);
         }
 
-        if (super.size == super.list.length) {
+        if (super.count == super.list.length) {
             super.expandCapacity();
         }
 
         Comparable<T> comparableElem = (Comparable<T>) element;
 
         int i = 0;
-        while (i < super.size && comparableElem.compareTo(super.list[i]) > 0) {
+        while (i < super.count && comparableElem.compareTo(super.list[i]) > 0) {
             i++;
         }
 
-        for (int j = super.size; j > i ; j--) {
+        for (int j = super.count; j > i ; j--) {
             super.list[j] = super.list[j - 1];
         }
 
         super.list[i] = element;
-        super.size++;
+        super.count++;
         super.modCount++;
     }
 }

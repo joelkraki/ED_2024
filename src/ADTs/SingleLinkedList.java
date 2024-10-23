@@ -141,4 +141,21 @@ public class SingleLinkedList<T> {
             current = current.getNext();
         }
     }
+
+    public String printSinglyLinkedListRecurs() {
+        if (isEmpty()) {
+            return ("Empty list.");
+        }
+
+        return printSinglyLinkedListRecurs(this.head);
+
+    }
+
+    public String printSinglyLinkedListRecurs(LinearNode<T> start) {
+        if (start == null) {
+            return "";
+        }
+
+        return start.getElement() + printSinglyLinkedListRecurs(start.getNext());
+    }
 }

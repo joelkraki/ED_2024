@@ -347,7 +347,7 @@ class DoubleLinkedOrderedListTest {
     }
 
     @Test
-    void testIteratorRemoveLastElement() throws EmptyCollectionException, ElementNotFoundException, NonComparableElementException {
+    void testIteratorRemoveLastElement() throws NonComparableElementException {
         DoubleLinkedOrderedList<Integer> list = new DoubleLinkedOrderedList<>();
         list.add(1);
         list.add(2);

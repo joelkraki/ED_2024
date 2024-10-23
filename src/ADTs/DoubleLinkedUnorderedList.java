@@ -2,7 +2,6 @@ package ADTs;
 
 import Exceptions.ElementNotFoundException;
 import Exceptions.EmptyCollectionException;
-import Exceptions.NoSuchElementException;
 
 public class DoubleLinkedUnorderedList<T> extends LinkedList<T> implements UnorderedListADT<T>{
 
@@ -20,14 +19,14 @@ public class DoubleLinkedUnorderedList<T> extends LinkedList<T> implements Unord
 
         newNode.setNext(super.head);
 
-        if (super.size == 0) {
+        if (super.count == 0) {
             super.tail = newNode;
         } else {
             super.head.setPrev(newNode);
         }
 
         super.head = newNode;
-        super.size++;
+        super.count++;
         super.modCount++;
     }
 
@@ -41,14 +40,14 @@ public class DoubleLinkedUnorderedList<T> extends LinkedList<T> implements Unord
 
         newNode.setPrev(super.tail);
 
-        if (super.size == 0) {
+        if (super.count == 0) {
             super.head = newNode;
         } else {
             super.tail.setNext(newNode);
         }
 
         super.tail = newNode;
-        super.size++;
+        super.count++;
         super.modCount++;
     }
 
@@ -58,11 +57,16 @@ public class DoubleLinkedUnorderedList<T> extends LinkedList<T> implements Unord
             throw new IllegalArgumentException("Parameter element / target is null");
         }
 
-        if (super.size == 0) {
+        if (super.count == 0) {
             throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
         }
 
         DoubleLinearNode<T> targetNode = super.findNode(target);
+
+        if (targetNode == null) {
+            throw new ElementNotFoundException(ElementNotFoundException.DEFAULT_MSG);
+        }
+
         DoubleLinearNode<T> newNode = new DoubleLinearNode<>(element);
 
         newNode.setPrev(targetNode);
@@ -78,7 +82,7 @@ public class DoubleLinkedUnorderedList<T> extends LinkedList<T> implements Unord
 
         targetNode.setNext(newNode);
 
-        super.size++;
+        super.count++;
         super.modCount++;
     }
 }

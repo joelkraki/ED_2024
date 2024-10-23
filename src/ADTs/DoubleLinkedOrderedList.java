@@ -22,7 +22,7 @@ public class DoubleLinkedOrderedList<T> extends LinkedList<T> implements Ordered
 
         DoubleLinearNode<T> newNode = new DoubleLinearNode<>(element);
 
-        if (super.size == 0) {
+        if (super.count == 0) {
             super.head = newNode;
             super.tail = newNode;
         } else {
@@ -51,7 +51,7 @@ public class DoubleLinkedOrderedList<T> extends LinkedList<T> implements Ordered
             }
         }
 
-        super.size++;
+        super.count++;
         super.modCount++;
     }
 }

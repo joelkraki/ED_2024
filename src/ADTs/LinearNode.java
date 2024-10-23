@@ -1,6 +1,6 @@
 package ADTs;
 
-class LinearNode<T> {
+public class LinearNode<T> {
 
     private LinearNode<T> next;
     private T element;

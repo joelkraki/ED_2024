@@ -2,7 +2,6 @@ package ADTs;
 
 import Exceptions.ElementNotFoundException;
 import Exceptions.EmptyCollectionException;
-import Exceptions.NoSuchElementException;
 
 public class ArrayUnorderedList<T> extends ArrayList<T> implements UnorderedListADT<T>{
 
@@ -19,16 +18,16 @@ public class ArrayUnorderedList<T> extends ArrayList<T> implements UnorderedList
             throw new IllegalArgumentException("Parameter element is null.");
         }
 
-        if (super.size == super.list.length) {
+        if (super.count == super.list.length) {
             super.expandCapacity();
         }
 
-        for (int i = super.size - 1; i >= 0; i--) {
+        for (int i = super.count - 1; i >= 0; i--) {
             super.list[i + 1] = super.list[i];
         }
 
         super.list[0] = element;
-        super.size++;
+        super.count++;
         super.modCount++;
     }
 
@@ -38,11 +37,11 @@ public class ArrayUnorderedList<T> extends ArrayList<T> implements UnorderedList
             throw new IllegalArgumentException("Parameter element is null.");
         }
 
-        if (super.size == super.list.length) {
+        if (super.count == super.list.length) {
             super.expandCapacity();
         }
 
-        super.list[super.size++] = element;
+        super.list[super.count++] = element;
         super.modCount++;
     }
 
@@ -52,22 +51,26 @@ public class ArrayUnorderedList<T> extends ArrayList<T> implements UnorderedList
             throw new IllegalArgumentException("Parameter element / target is null");
         }
 
-        if (super.size == 0) {
+        if (super.count == 0) {
             throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
         }
 
-        if (super.size == super.list.length) {
+        if (super.count == super.list.length) {
             super.expandCapacity();
         }
 
         int targetIndex = super.findElement(target);
 
-        for (int i = super.size; i > targetIndex + 1; i--) {
+        if (targetIndex == -1) {
+            throw new ElementNotFoundException(ElementNotFoundException.DEFAULT_MSG);
+        }
+
+        for (int i = super.count; i > targetIndex + 1; i--) {
             super.list[i] = super.list[i - 1];
         }
 
         super.list[targetIndex + 1] = element;
-        super.size++;
+        super.count++;
         super.modCount++;
     }
 }

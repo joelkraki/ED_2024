@@ -13,12 +13,12 @@ public abstract class ArrayList<T> implements ListADT<T> {
     private static final int GROWTH_FACTOR = 2;
 
     protected T[] list;
-    protected int size;
+    protected int count;
     protected int modCount;
 
     public ArrayList(int capacity) {
         list = (T[]) new Object[capacity];
-        this.size = 0;
+        this.count = 0;
         this.modCount = 0;
     }
 
@@ -27,58 +27,62 @@ public abstract class ArrayList<T> implements ListADT<T> {
     }
 
     @Override
-    public T removeFirst() throws EmptyCollectionException { //??se fosse circular este metodo nao tinha que ser O(n)
-        if (this.size == 0) {
+    public T removeFirst() throws EmptyCollectionException {
+        if (this.count == 0) {
             throw new EmptyCollectionException();
         }
 
         T first = this.list[0];
 
-        for (int i = 0; i < this.size - 1; i++) {
+        for (int i = 0; i < this.count - 1; i++) {
             this.list[i] = this.list[i + 1];
         }
 
-        this.list[this.size - 1] = null;
-        this.size--;
+        this.list[--this.count] = null;
         this.modCount++;
+
         return first;
     }
 
     @Override
     public T removeLast() throws EmptyCollectionException {
-        if (this.size == 0) {
+        if (this.count == 0) {
             throw new EmptyCollectionException();
         }
 
-        T last = this.list[this.size - 1];
+        T last = this.list[this.count - 1];
 
-        this.list[this.size - 1] = null;
-        this.size--;
+        this.list[--this.count] = null;
         this.modCount++;
+
         return last;
     }
 
     @Override
     public T remove(T element) throws EmptyCollectionException, ElementNotFoundException {
-        if (this.size == 0) {
+        if (this.count == 0) {
             throw new EmptyCollectionException();
         }
 
         int index = findElement(element);
 
-        for (int i = index; i < this.size - 1; i++) {
+        if (index == -1) {
+            throw new ElementNotFoundException(ElementNotFoundException.DEFAULT_MSG);
+        }
+
+        for (int i = index; i < this.count - 1; i++) {
             this.list[i] = this.list[i + 1];
         }
 
-        this.list[this.size - 1] = null;
-        this.size--;
+        this.list[--this.count] = null;
         this.modCount++;
+
         return element;
     }
 
     @Override
     public T first() throws EmptyCollectionException {
-        if (this.size == 0) {
+        if (this.count == 0) {
             throw new EmptyCollectionException();
         }
 
@@ -87,42 +91,36 @@ public abstract class ArrayList<T> implements ListADT<T> {
 
     @Override
     public T last() throws EmptyCollectionException {
-        if (this.size == 0) {
+        if (this.count == 0) {
             throw new EmptyCollectionException();
         }
 
-        return this.list[this.size - 1];
+        return this.list[this.count - 1];
     }
 
     @Override
     public boolean contains(T target) {
-        try {
-            findElement(target);
-        } catch (ElementNotFoundException e) { //??? Esta abordagem é muito pesada por lançar uma exceção?
-            return false;
-        }
-
-        return true;
+        return findElement(target) != -1;
     }
 
     @Override
     public boolean isEmpty() {
-        return this.size == 0;
+        return this.count == 0;
     }
 
     @Override
     public int size() {
-        return this.size;
+        return this.count;
     }
 
     @Override
     public Iterator<T> iterator() {
-        return new BasicIterator(this.modCount);
+        return new BasicIterator();
     }
 
     @Override
     public String toString() {
-        if (this.size == 0) {
+        if (this.count == 0) {
             return "[]";
         }
 
@@ -138,14 +136,24 @@ public abstract class ArrayList<T> implements ListADT<T> {
         return str.toString();
     }
 
-    protected int findElement(T element) throws ElementNotFoundException {
-        for (int i = 0; i < this.size; i++) {
+    protected int findElement(T element) {
+        for (int i = 0; i < this.count; i++) {
             if (this.list[i].equals(element)) {
                 return i;
             }
         }
 
-        throw new ElementNotFoundException(ElementNotFoundException.DEFAULT_MSG);
+        return -1;
+    }
+
+    protected void expandCapacity() {
+        T[] newArray = (T[]) (new Object[this.list.length * GROWTH_FACTOR]);
+
+        for (int i = 0; i < this.list.length; i++) {
+            newArray[i] = this.list[i];
+        }
+
+        this.list = newArray;
     }
 
     private class BasicIterator implements Iterator<T> {
@@ -153,15 +161,15 @@ public abstract class ArrayList<T> implements ListADT<T> {
         private boolean okToRemove;
         private int expectedModCount;
 
-        public BasicIterator(int expectedModCount) {
-            this.expectedModCount = expectedModCount;
+        public BasicIterator() {
+            this.expectedModCount = ArrayList.this.modCount;
             this.okToRemove = false;
             this.cursor = 0;
         }
 
         @Override
         public boolean hasNext() {
-            return cursor != size;
+            return cursor != count;
         }
 
         @Override
@@ -169,7 +177,7 @@ public abstract class ArrayList<T> implements ListADT<T> {
             if (expectedModCount != modCount) {
                 throw new ConcurrentModificationException("Concurrent Modification Detected.");
             }
-            if (cursor == size) {
+            if (!hasNext()) {
                 throw new NoSuchElementException("Next element not found");
             }
 
@@ -188,28 +196,15 @@ public abstract class ArrayList<T> implements ListADT<T> {
                 throw new UnsupportedOperationException("Can't perform this operation");
             }
 
-            for (int i = cursor - 1; i < ArrayList.this.size - 1; i++) {
-                ArrayList.this.list[i] = ArrayList.this.list[i + 1];
+            try {
+                ArrayList.this.remove(list[cursor - 1]); //pode dar problemas elementos repetidos
+            } catch (EmptyCollectionException | ElementNotFoundException e) {
+                return;
             }
-
-            ArrayList.this.list[ArrayList.this.size - 1] = null;
-            ArrayList.this.size--;
-            ArrayList.this.modCount++;
 
             this.cursor--;
             okToRemove = false;
             this.expectedModCount++;
         }
     }
-
-    protected void expandCapacity() {
-        T[] newArray = (T[]) (new Object[this.list.length * GROWTH_FACTOR]);
-
-        for (int i = 0; i < this.list.length; i++) {
-            newArray[i] = this.list[i];
-        }
-
-        this.list = newArray;
-    }
-
 }
