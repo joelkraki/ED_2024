@@ -208,4 +208,72 @@ public class SentinelDoubleLinkedList<T> {
 
         return current;
     }
+
+    public String printSentinelDoublyLinkedListRecurs(boolean leftToRight) {
+        if (isEmpty()) {
+            return ("Empty list.");
+        }
+
+        if (leftToRight) {
+            return printSentinelDoublyLinkedListRecursLeftToRight(this.head.getNext());
+        }
+
+       return printSentinelDoublyLinkedListRecursRightToLeft(this.tail.getPrev());
+
+    }
+
+    private String printSentinelDoublyLinkedListRecursLeftToRight(DoubleLinearNode<T> start) {
+        if (start == this.tail) {
+            return "";
+        }
+
+        return start.getElement() + printSentinelDoublyLinkedListRecursLeftToRight(start.getNext());
+    }
+
+    private String printSentinelDoublyLinkedListRecursRightToLeft(DoubleLinearNode<T> start) {
+        if (start == this.head) {
+            return "";
+        }
+
+        return printSentinelDoublyLinkedListRecursRightToLeft(start.getPrev()) + start.getElement();
+    }
+
+    public void replace(T existingElement, T newElement) throws ElementNotFoundException {
+        if (this.size == 0) {
+            throw new ElementNotFoundException();
+        }
+
+        replace(existingElement, newElement, this.head.getNext());
+    }
+
+    private void replace(T existingElement, T newElement, DoubleLinearNode<T> start) throws ElementNotFoundException {
+        if (start == this.tail) {
+            return;
+        }
+
+        DoubleLinearNode<T> foundNode;
+
+        try {
+            foundNode = findNode(existingElement, start);
+        } catch (ElementNotFoundException e) {
+            if (start == this.head.getNext()) {
+                throw new ElementNotFoundException(e.getMessage());
+            }
+            return;
+        }
+
+        DoubleLinearNode<T> newNode = new DoubleLinearNode<>(newElement);
+
+        DoubleLinearNode<T> predecessor = foundNode.getPrev();
+        DoubleLinearNode<T> successor = foundNode.getNext();
+
+        predecessor.setNext(newNode);
+        successor.setPrev(newNode);
+        newNode.setPrev(predecessor);
+        newNode.setNext(successor);
+        foundNode.setNext(null);
+        foundNode.setPrev(null);
+
+        replace(existingElement, newElement, newNode.getNext());
+    }
 }

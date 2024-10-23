@@ -188,13 +188,11 @@ public abstract class ArrayList<T> implements ListADT<T> {
                 throw new UnsupportedOperationException("Can't perform this operation");
             }
 
-            for (int i = cursor - 1; i < ArrayList.this.size - 1; i++) {
-                ArrayList.this.list[i] = ArrayList.this.list[i + 1];
+            try {
+                ArrayList.this.remove(list[cursor - 1]);
+            } catch (EmptyCollectionException | ElementNotFoundException e) {
+                return;
             }
-
-            ArrayList.this.list[ArrayList.this.size - 1] = null;
-            ArrayList.this.size--;
-            ArrayList.this.modCount++;
 
             this.cursor--;
             okToRemove = false;

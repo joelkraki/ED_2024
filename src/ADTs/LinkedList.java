@@ -217,12 +217,22 @@ public abstract class LinkedList<T> implements ListADT<T> {
                 throw new ConcurrentModificationException("Concurrent Modification detected");
             }
 
+
             if (this.cursor == null) {
                 try {
                     removeLast();
                 } catch (EmptyCollectionException e) {
                 }
-            } else if (this.cursor.getPrev() == LinkedList.this.head){
+            } else {
+                try {
+                    LinkedList.this.remove(this.cursor.getPrev().getElement());
+                } catch (EmptyCollectionException | ElementNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+
+                /*if (this.cursor.getPrev() == LinkedList.this.head){
                 try {
                     removeFirst();
                 } catch (EmptyCollectionException e) {
@@ -237,7 +247,7 @@ public abstract class LinkedList<T> implements ListADT<T> {
 
                 LinkedList.this.size--;
                 LinkedList.this.modCount++;
-            }
+            }*/
 
             this.okToRemove = false;
             this.expectedModCount++;

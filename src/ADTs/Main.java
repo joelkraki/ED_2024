@@ -10,6 +10,8 @@ public class Main {
         weirdQueueManager.addString("B");
         weirdQueueManager.addString("C");
         weirdQueueManager.addString("D");
+        weirdQueueManager.addString("E");
+
 
         try {
             weirdQueueManager.mergeQueues();
