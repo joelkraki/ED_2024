@@ -1,5 +1,7 @@
 package Utilities;
 
+import ADTs.SentinelDoubleLinkedList;
+
 public class SortSearch {
 
     /**
@@ -12,8 +14,7 @@ public class SortSearch {
      * @param target the element being searched for
      * @return true if the desired element is found
      */
-    public static <T extends Comparable<? super T>> boolean linearSearch (T[] data, int min, int max, T target)
-    {
+    public static <T extends Comparable<? super T>> boolean linearSearch (T[] data, int min, int max, T target) {
         int index = min;
         boolean found = false;
 

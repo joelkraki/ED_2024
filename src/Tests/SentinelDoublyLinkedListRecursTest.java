@@ -123,7 +123,7 @@ class SentinelDoublyLinkedListRecursTest {
     }
 
     @Test
-    public void testReplace_SingleOccurrence() throws ElementNotFoundException {
+    public void testReplace_SingleOccurrence() throws ElementNotFoundException, EmptyCollectionException {
         // Add elements to the list
         list.addFront("A");
         list.addLast("B");
@@ -138,7 +138,7 @@ class SentinelDoublyLinkedListRecursTest {
     }
 
     @Test
-    public void testReplace_MultipleOccurrences() throws ElementNotFoundException {
+    public void testReplace_MultipleOccurrences() throws ElementNotFoundException, EmptyCollectionException {
         // Add multiple occurrences of "A" to the list
         list.addFront("A");
         list.addLast("B");
@@ -174,7 +174,7 @@ class SentinelDoublyLinkedListRecursTest {
     @Test
     public void testReplace_EmptyList() {
         // Try to replace in an empty list
-        assertThrows(ElementNotFoundException.class, () -> {
+        assertThrows(EmptyCollectionException.class, () -> {
             list.replace("A", "X");
         });
 
@@ -184,7 +184,7 @@ class SentinelDoublyLinkedListRecursTest {
     }
 
     @Test
-    public void testReplace_FirstAndLastOccurrence() throws ElementNotFoundException {
+    public void testReplace_FirstAndLastOccurrence() throws ElementNotFoundException, EmptyCollectionException {
         // Add elements to the list, including occurrences at both ends
         list.addFront("A");
         list.addLast("B");
@@ -200,7 +200,7 @@ class SentinelDoublyLinkedListRecursTest {
     }
 
     @Test
-    public void testReplace_OnlyElementInList() throws ElementNotFoundException {
+    public void testReplace_OnlyElementInList() throws ElementNotFoundException, EmptyCollectionException {
         // Add only one element
         list.addFront("A");
 

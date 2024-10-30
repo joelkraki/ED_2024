@@ -2,10 +2,12 @@ package ADTs;
 import Exceptions.ElementNotFoundException;
 import Exceptions.EmptyCollectionException;
 import Exceptions.InvalidParameterTypeException;
+import Exceptions.NonComparableElementException;
 
 import java.util.Arrays;
+import java.util.Comparator;
 
-public class SentinelDoubleLinkedList<T> {
+public class SentinelDoubleLinkedList<T extends Comparable<? super T>> {
 
     private DoubleLinearNode<T> head;
     private DoubleLinearNode<T> tail;
@@ -55,6 +57,10 @@ public class SentinelDoubleLinkedList<T> {
         }
 
         DoubleLinearNode<T> node = findNode(element, this.head.getNext());
+
+        if (node == null) {
+            throw new ElementNotFoundException(ElementNotFoundException.DEFAULT_MSG);
+        }
 
         return remove(node);
     }
@@ -190,7 +196,7 @@ public class SentinelDoubleLinkedList<T> {
         return nodeToRemove.getElement();
     }
 
-    private DoubleLinearNode<T> findNode(T element, DoubleLinearNode<T> start) throws ElementNotFoundException {
+    private DoubleLinearNode<T> findNode(T element, DoubleLinearNode<T> start) {
         boolean found = false;
         DoubleLinearNode<T> current = start;
 
@@ -203,7 +209,7 @@ public class SentinelDoubleLinkedList<T> {
         }
 
         if (!found) {
-            throw new ElementNotFoundException("Parameter element not found in Linked List");
+            return null;
         }
 
         return current;
@@ -238,9 +244,9 @@ public class SentinelDoubleLinkedList<T> {
         return printSentinelDoublyLinkedListRecursRightToLeft(start.getPrev()) + start.getElement();
     }
 
-    public void replace(T existingElement, T newElement) throws ElementNotFoundException {
+    public void replace(T existingElement, T newElement) throws ElementNotFoundException, EmptyCollectionException {
         if (this.size == 0) {
-            throw new ElementNotFoundException();
+            throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
         }
 
         replace(existingElement, newElement, this.head.getNext());
@@ -251,14 +257,13 @@ public class SentinelDoubleLinkedList<T> {
             return;
         }
 
-        DoubleLinearNode<T> foundNode;
+        DoubleLinearNode<T> foundNode = findNode(existingElement, start);
 
-        try {
-            foundNode = findNode(existingElement, start);
-        } catch (ElementNotFoundException e) {
+        if (foundNode == null) {
             if (start == this.head.getNext()) {
-                throw new ElementNotFoundException(e.getMessage());
+                throw new ElementNotFoundException(ElementNotFoundException.DEFAULT_MSG);
             }
+
             return;
         }
 
@@ -275,5 +280,197 @@ public class SentinelDoubleLinkedList<T> {
         foundNode.setPrev(null);
 
         replace(existingElement, newElement, newNode.getNext());
+    }
+
+    public boolean linearSearch (T target) throws EmptyCollectionException {
+        if (this.size == 0) {
+            throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
+        }
+
+        DoubleLinearNode<T> current = this.head.getNext();
+        boolean found = false;
+
+        while (!found && current != this.tail) {
+            if (target.compareTo(current.getElement()) == 0)
+                found = true;
+
+            current = current.getNext();
+        }
+
+        return found;
+    }
+
+    public void selectionSort () throws EmptyCollectionException {
+        if (this.size == 0) {
+            throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
+        }
+
+        DoubleLinearNode<T> min;
+        DoubleLinearNode<T> current = this.head.getNext();
+        DoubleLinearNode<T> last = this.tail.getPrev();
+        T temp;
+
+        while (current != last) {
+            min = current;
+
+            DoubleLinearNode<T> scan = current.getNext();
+
+            while (scan != this.tail) {
+                if (scan.getElement().compareTo(min.getElement()) < 0) {
+                    min = scan;
+                }
+
+                scan = scan.getNext();
+            }
+
+            temp = min.getElement();
+            min.setElement(current.getElement());
+            current.setElement(temp);
+
+            current = current.getNext();
+        }
+    }
+
+    public void insertionSort () throws EmptyCollectionException {
+        if (this.size == 0) {
+            throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
+        }
+
+        DoubleLinearNode<T> current = this.head.getNext().getNext(); //Starts at the 2nd element
+
+        while (current != this.tail) {
+            T currElem = current.getElement();
+
+            DoubleLinearNode<T> position = current.getPrev();
+
+            while (position != this.head && position.getElement().compareTo(currElem) > 0) {
+                position = position.getPrev();
+            }
+
+            if (position != current.getPrev()) {
+                DoubleLinearNode<T> posNext = position.getNext();
+
+                posNext.setPrev(current);
+                position.setNext(current);
+
+                current.getPrev().setNext(current.getNext());
+                current.getNext().setPrev(current.getPrev());
+
+                current.setNext(posNext);
+                current.setPrev(position);
+            }
+
+            current = current.getNext();
+        }
+    }
+
+    public void bubbleSort () throws EmptyCollectionException {
+        if (this.size == 0) {
+            throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
+        }
+
+        DoubleLinearNode<T> position = this.tail.getPrev();
+        DoubleLinearNode<T> scan = null;
+        T temp;
+
+        while (position != this.head) {
+            scan = this.head.getNext();
+
+            while (scan != position) {
+                if (scan.getElement().compareTo(scan.getNext().getElement()) > 0) {
+                    temp = scan.getElement();
+                    scan.setElement(scan.getNext().getElement());
+                    scan.getNext().setElement(temp);
+                }
+
+                scan = scan.getNext();
+            }
+
+            position = position.getPrev();
+        }
+    }
+
+    public void quickSort() throws EmptyCollectionException {
+        if (this.size == 0) {
+            throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
+        }
+
+        quickSort(this.head.getNext(), this.tail.getPrev());
+    }
+
+    private void quickSort(DoubleLinearNode<T> start, DoubleLinearNode<T> end) throws EmptyCollectionException {
+        if (end.getPrev() == start) {
+            return;
+        }
+
+        DoubleLinearNode<T> nodeOfPartition = findPartition(start, end);
+
+        quickSort(start, nodeOfPartition.getPrev());
+
+        quickSort(nodeOfPartition.getNext(), end);
+    }
+
+    private DoubleLinearNode<T> findPartition (DoubleLinearNode<T> start, DoubleLinearNode<T> end) throws EmptyCollectionException {
+        DoubleLinearNode<T> left, right;
+        T temp, partitionelement;
+        DoubleLinearNode<T> middle = findMiddle();
+
+        // use middle element as partition
+        partitionelement = middle.getElement();
+        left = start;
+        right = end;
+
+        while (right.getPrev() != left) {
+            /** search for an element that is > the partitionelement */
+            while (left.getElement().compareTo(partitionelement) < 0) {
+                left = left.getNext();
+            }
+            /** search for an element that is < the partitionelement */
+            while (right.getElement().compareTo(partitionelement) > 0)
+                right = right.getPrev();
+
+            /** swap the elements */
+            if (right != middle && left != middle)
+            {
+                temp = left.getElement();
+                left.setElement(right.getElement());
+                right.setElement(temp);
+            }
+        }
+
+        /** move partition element to partition index*/
+        temp = start.getElement();
+        start.setElement(right.getElement());
+        right.setElement(temp);
+
+        return right;
+    }
+
+    private DoubleLinearNode<T> findMiddle() throws EmptyCollectionException {
+        if (this.size == 0) {
+            throw new EmptyCollectionException(EmptyCollectionException.DEFAULT_MESSAGE);
+        }
+
+        DoubleLinearNode<T> current = this.head.getNext();
+
+        for (int i = 0; i < this.size / 2; i++) {
+            current = current.getNext();
+        }
+
+        return current;
+    }
+
+    private class BasicComparator implements Comparator<T> {
+
+        @Override
+        public int compare(T o1, T o2) {
+            if (!(o1 instanceof Comparable)) {
+                throw new IllegalArgumentException(NonComparableElementException.DEFAULT_MSG);
+            }
+
+            Comparable<T> cmpO1 = (Comparable<T>) o1;
+
+            return cmpO1.compareTo(o1);
+        }
     }
 }
